@@ -2,29 +2,31 @@ package main
 
 import (
 	"fmt"
+	"math/big"
 )
+
+func fib(c chan<- *big.Int) {
+	x, y := big.NewInt(0), big.NewInt(1)
+
+	for {
+		c <- x
+
+		x, y = y, x
+		x.Add(x, y)
+	}
+}
 
 func main() {
 	var digits int
+
+	fmt.Println("Calculate Fibonacci sequence up to n. Enter n")
 	fmt.Scanln(&digits)
 
-	d1 := 0
-	d2 := 1
-	next := 0
+	c := make(chan *big.Int)
 
-	for i := 1; i <= digits; i++ {
-		if i == 1 {
-			fmt.Println(d1)
-			continue
-		}
-		if i == 2 {
-			fmt.Println(d2)
-			continue
-		}
+	go fib(c)
 
-		next = d1 + d2
-		d1 = d2
-		d2 = next
-		fmt.Println(next)
+	for i := 0; i <= digits; i++ {
+		fmt.Println(<-c)
 	}
 }
